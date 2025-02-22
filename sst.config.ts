@@ -52,5 +52,9 @@ export default $config({
         VITE_PUBLIC_API_URL: backend.url,
       },
     });
+
+    return {
+      bucketname: bucket.name,
+    };
   },
 });
