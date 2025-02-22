@@ -12,6 +12,7 @@ export const images = s.sqliteTable("images", {
     .text("claim_id")
     .notNull()
     .references(() => claims.id),
+  type: s.text("type").notNull().$type<"image" | "video" | "audio" | "text">(),
 
   fraudScore: s.real("fraud_score"),
 });
