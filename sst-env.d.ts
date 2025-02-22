@@ -10,6 +10,14 @@ declare module "sst" {
       "type": "sst.aws.Function"
       "url": string
     }
+    "Bucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "BucketUrl": {
+      "type": "sst.sst.Linkable"
+      "url": string
+    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
       "url": string

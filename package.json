@@ -2,7 +2,8 @@
   "name": "claimguard",
   "type": "module",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "sst": "^3.9.10"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

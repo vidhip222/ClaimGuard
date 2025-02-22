@@ -27,10 +27,19 @@ export default $config({
       group: turso.getGroup({ id: "group" }).then((group) => group.id),
     });
 
+    const bucket = new sst.aws.Bucket("Bucket", {
+      access: "public",
+    });
+    new sst.Linkable("BucketUrl", {
+      properties: {
+        url: $interpolate`https://${bucket.name}.s3.amazonaws.com`,
+      },
+    });
+
     const backend = new sst.aws.Function("Backend", {
       handler: "backend/src/index.handler",
       url: true,
-      link: [db],
+      link: [db, bucket],
     });
 
     const frontend = new sst.aws.StaticSite("Frontend", {
