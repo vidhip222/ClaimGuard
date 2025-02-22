@@ -13,8 +13,7 @@ export const images = s.sqliteTable("images", {
     .notNull()
     .references(() => claims.id),
 
-  s3key: s.text("s3key").notNull(),
-  fraudScore: s.real("fraud_score").notNull(),
+  fraudScore: s.real("fraud_score"),
 });
 
 export const claimsRelations = relations(claims, ({ many }) => ({

@@ -1,4 +1,4 @@
-import { createRoute, Link } from "@tanstack/react-router";
+import { createRoute, useRouter } from "@tanstack/react-router";
 import { rootRoute } from "./root";
 import {
   Shield,
@@ -7,6 +7,8 @@ import {
   DollarSign,
   AlertTriangle,
 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { api } from "../api";
 
 export const homeRoute = createRoute({
   path: "/",
@@ -15,6 +17,19 @@ export const homeRoute = createRoute({
 });
 
 export default function LandingPage() {
+  const router = useRouter();
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const res = await api.claim.$put();
+      return await res.json();
+    },
+    onSuccess: ({ id }) => {
+      router.navigate({
+        to: "/claim/$id",
+        params: { id },
+      });
+    },
+  });
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-800">
       <header className="bg-blue-600 text-white py-4">
@@ -36,12 +51,13 @@ export default function LandingPage() {
               Intelligent damage assessment and fraud detection for faster,
               fairer claims processing.
             </p>
-            <Link
-              to="/upload"
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 hover:bg-gray-100"
+            <button
+              onClick={() => mutation.mutate()}
+              className="bg-white text-blue-600 px-6 py-3 rounded-lg text-lg font-semibold transition duration-300 hover:bg-gray-100 disabled:bg-gray-300"
+              disabled={mutation.isPending}
             >
-              Get Started
-            </Link>
+              {mutation.isPending ? "Creating..." : "Get Started"}
+            </button>
           </div>
         </section>
 

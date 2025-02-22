@@ -10,9 +10,16 @@ interface UploadState {
   id?: string;
   status: "pending" | "uploading" | "completed" | "error";
 }
+// Route configuration
+export const claimsRoute = createRoute({
+  path: "/claim/$id",
+  getParentRoute: () => rootRoute,
+  component: Claims,
+});
 
 // Component
-function Upload() {
+function Claims() {
+  const { id } = claimsRoute.useParams();
   const [files, setFiles] = useState<File[]>([]);
   const [uploadStates, setUploadStates] = useState<Record<string, UploadState>>(
     {},
@@ -21,63 +28,58 @@ function Upload() {
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]) => {
-      const presignedResponse = await api.upload[":amount"].$get({
-        param: { amount: files.length.toString() },
-      });
-      // Get presigned URLs for all files
-      const presignedUrls = await presignedResponse.json();
+      await Promise.all(
+        files.map(async (file) => {
+          const imageupload = await api.claim[":id"].$post({ param: { id } });
+          if (!imageupload.ok) throw new Error("Failed to upload image");
+          const { url } = await imageupload.json();
 
-      // Upload each file
-      const uploads = presignedUrls.map(async ({ id, url }, index) => {
-        const file = files[index];
-
-        // Create upload state
-        setUploadStates((prev) => ({
-          ...prev,
-          [id]: {
-            file,
-            progress: 0,
-            id,
-            status: "uploading",
-          },
-        }));
-
-        try {
-          const response = await fetch(url, {
-            method: "PUT",
-            body: file,
-            headers: {
-              "Content-Type": file.type,
-            },
-          });
-
-          if (!response.ok) throw new Error(`Upload failed for ${file.name}`);
-
-          // Update state on success
+          // Create upload state
           setUploadStates((prev) => ({
             ...prev,
             [id]: {
-              ...prev[id],
-              progress: 100,
-              status: "completed",
+              file,
+              progress: 0,
+              id,
+              status: "uploading",
             },
           }));
 
-          return { id, fileName: file.name };
-        } catch (error) {
-          // Update state on error
-          setUploadStates((prev) => ({
-            ...prev,
-            [id]: {
-              ...prev[id],
-              status: "error",
-            },
-          }));
-          throw error;
-        }
-      });
+          try {
+            const response = await fetch(url, {
+              method: "PUT",
+              body: file,
+              headers: {
+                "Content-Type": file.type,
+              },
+            });
 
-      return Promise.all(uploads);
+            if (!response.ok) throw new Error(`Upload failed for ${file.name}`);
+
+            // Update state on success
+            setUploadStates((prev) => ({
+              ...prev,
+              [id]: {
+                ...prev[id],
+                progress: 100,
+                status: "completed",
+              },
+            }));
+
+            return { id, fileName: file.name };
+          } catch (error) {
+            // Update state on error
+            setUploadStates((prev) => ({
+              ...prev,
+              [id]: {
+                ...prev[id],
+                status: "error",
+              },
+            }));
+            throw error;
+          }
+        }),
+      );
     },
   });
 
@@ -148,10 +150,3 @@ function Upload() {
     </div>
   );
 }
-
-// Route configuration
-export const uploadRoute = createRoute({
-  path: "/upload",
-  getParentRoute: () => rootRoute,
-  component: Upload,
-});
