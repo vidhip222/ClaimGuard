@@ -2,12 +2,7 @@ import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
-
-// Types
-interface PresignedUrl {
-  id: string;
-  url: string;
-}
+import { api } from "../api";
 
 interface UploadState {
   file: File;
@@ -23,19 +18,14 @@ function Upload() {
     {},
   );
 
-  // Fetch presigned URLs
-  const getPresignedUrls = async (amount: number) => {
-    const api = import.meta.env.VITE_PUBLIC_API_URL;
-    const response = await fetch(`${api}upload/${amount}`);
-    if (!response.ok) throw new Error("Failed to get upload URLs");
-    return response.json() as Promise<PresignedUrl[]>;
-  };
-
   // Upload mutation
   const uploadMutation = useMutation({
     mutationFn: async (files: File[]) => {
+      const presignedResponse = await api.upload[":amount"].$get({
+        param: { amount: files.length.toString() },
+      });
       // Get presigned URLs for all files
-      const presignedUrls = await getPresignedUrls(files.length);
+      const presignedUrls = await presignedResponse.json();
 
       // Upload each file
       const uploads = presignedUrls.map(async ({ id, url }, index) => {
@@ -114,7 +104,7 @@ function Upload() {
           multiple
           onChange={handleFileSelect}
           className="mb-2"
-          accept="image/*"
+          accept="*"
         />
         <button
           onClick={handleUpload}

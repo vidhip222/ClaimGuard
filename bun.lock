@@ -34,6 +34,7 @@
       "dependencies": {
         "@tanstack/react-query": "^5.66.9",
         "@tanstack/react-router": "^1.109.2",
+        "hono": "^4.7.2",
         "lucide-react": "^0.475.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -44,6 +45,7 @@
         "@types/react": "^19.0.8",
         "@types/react-dom": "^19.0.3",
         "@vitejs/plugin-react-swc": "^3.5.0",
+        "backend": "workspace:*",
         "eslint": "^9.19.0",
         "eslint-plugin-react-hooks": "^5.0.0",
         "eslint-plugin-react-refresh": "^0.4.18",
