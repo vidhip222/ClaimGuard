@@ -19,6 +19,7 @@ function Claims() {
   const { id } = claimsRoute.useParams();
   const [files, setFiles] = useState<File[]>([]);
 
+
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFiles = Array.from(event.target.files || []);
@@ -27,7 +28,9 @@ function Claims() {
     [],
   );
 
+
   return (
+
     <div>
       <Navbar/>
       <div className="flex flex-col h-screen">
@@ -59,16 +62,19 @@ function Claims() {
           multiple
           onChange={handleFileSelect}
         />
+
       </div>
       <div className="flex flex-row flex-grow">
         <div className="w-1/2 bg-white p-4">
           <Upload files={files} setFiles={setFiles} id={id}/>
         </div>
 
+
         <div className="w-1/2 bg-green-100 p-4 overflow-auto">
           <DataView />
         </div>
       </div>
+
       </div>
     </div>
   );

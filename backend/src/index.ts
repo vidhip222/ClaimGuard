@@ -9,6 +9,7 @@ import { logger } from "hono/logger";
 import { sValidator } from "@hono/standard-validator";
 import { z } from "zod";
 
+
 const app = new Hono()
   .use(logger())
   .get("/", (c) => c.text("Hello World"))
@@ -29,10 +30,10 @@ const app = new Hono()
       }),
     ),
     async (c) => {
-      const id = c.req.param().id;
+      const claimid = c.req.param().id;
       const { type } = c.req.valid("json");
       const claim = await db.query.claims.findFirst({
-        where: eq(schema.claims.id, id),
+        where: eq(schema.claims.id, claimid),
         with: {
           images: true,
         },
@@ -51,7 +52,7 @@ const app = new Hono()
           s3,
           new PutObjectCommand({
             Bucket: Resource.Bucket.name,
-            Key: id,
+            Key: imageid,
           }),
         ),
       ]);
