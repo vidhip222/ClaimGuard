@@ -21,9 +21,8 @@ export default $config({
         url: $interpolate`libsql://${db.id}-rgodha.aws-us-east-1.turso.io`,
       },
     }));
-
     const db = new turso.Database("db", {
-      group: turso.getGroupOutput({ id: "group" }).id,
+      group: turso.getGroup({ id: "group" }).then((group) => group.id),
     });
 
     const bucket = new sst.aws.Bucket("Bucket", {
@@ -65,7 +64,6 @@ export default $config({
       handler: "backend/src/index.handler",
       url: true,
       link: [db, bucket],
-      nodejs: { install: ["@libsql/client"] },
     });
 
     const frontend = new sst.aws.StaticSite("Frontend", {
@@ -76,13 +74,11 @@ export default $config({
       },
       environment: {
         VITE_PUBLIC_API_URL: backend.url,
-        VITE_PUBLIC_BUCKET_URL: $interpolate`https://${bucket.name}.s3.amazonaws.com`,
       },
     });
 
     return {
       bucketname: bucket.name,
-      dbname: db.name,
     };
   },
 });
