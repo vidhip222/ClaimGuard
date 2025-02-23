@@ -10,6 +10,7 @@ interface FileItemProps {
     id: string;
     type: "image" | "video" | "audio" | "text";
     fraudScore: number | null;
+    processed: number;
   };
   onUploadComplete: () => void;
   startUpload: boolean;
@@ -36,7 +37,7 @@ export function FileItem({
   claimId,
   claimImage,
   onUploadComplete,
-  startUpload
+  startUpload,
 }: FileItemProps) {
   const uploadMutation = useMutation({
     mutationFn: async (fileToUpload: File) => {
@@ -68,16 +69,16 @@ export function FileItem({
         throw new Error(`Upload failed for ${fileToUpload.name}`);
       }
     },
-    onSuccess: () => {
+    onSettled: () => {
       onUploadComplete();
     },
   });
 
   useEffect(() => {
-    if(startUpload){
+    if (startUpload) {
       uploadMutation.mutate(file!);
     }
-  }, [startUpload])
+  }, [startUpload]);
 
   // If we have a claimImage, render the completed upload view
   if (claimImage) {
@@ -88,7 +89,7 @@ export function FileItem({
           <p className="text-sm text-gray-500">Type: {claimImage.type}</p>
           {claimImage.fraudScore !== null && (
             <p className="text-sm text-gray-500">
-              Fraud Score: {claimImage.fraudScore}
+              Fraud Score: {claimImage.fraudScore / (claimImage.processed || 1)}
             </p>
           )}
         </div>
@@ -112,13 +113,7 @@ export function FileItem({
         {uploadMutation.isPending ? (
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent" />
         ) : (
-          <button
-            onClick={() => uploadMutation.mutate(file)}
-            disabled={uploadMutation.isPending}
-            className="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
-          >
-            Upload
-          </button>
+          <></>
         )}
         {uploadMutation.isError && (
           <span className="text-red-500">

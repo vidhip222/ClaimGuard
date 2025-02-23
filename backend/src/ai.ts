@@ -148,7 +148,7 @@ export async function analyzeImage(imgPath: string) {
         .filter((block) => block.type === "text")
         .map((block) => (block as TextBlock).text)
         .join("\n")
-        .replace(/\D/g, ""),
+        .match(/\d+/)?.[0] || "0",
     );
   } catch (error) {
     console.error("Error analyzing image:", error);

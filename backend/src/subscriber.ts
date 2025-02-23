@@ -32,6 +32,7 @@ export const handler = async (event: AWSLambda.S3CreateEvent) => {
         processed: sql`${schema.images.processed} + 1`,
         fraudScore: sql`${schema.images.fraudScore} + ${score / 10}`,
       })
+      .where(eq(schema.images.id, key))
       .returning();
   } else if (img.type === "audio") {
     // transcribe then llm
@@ -57,6 +58,7 @@ export const handler = async (event: AWSLambda.S3CreateEvent) => {
         processed: sql`${schema.images.processed} + 1`,
         cost,
       })
+      .where(eq(schema.images.id, key))
       .returning();
   } else if (img.type === "video") {
     // send to rust worker
@@ -84,6 +86,7 @@ export const handler = async (event: AWSLambda.S3CreateEvent) => {
           }),
         );
       }),
+
       db
         .update(schema.images)
         .set({

@@ -5,8 +5,8 @@ import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
 import { api } from "../api";
 import { FileItem } from "../lib/file-item";
-import DataView from '../components/dataView';
-import Upload from '../components/upload';
+import DataView from "../components/dataView";
+import Upload from "../components/upload";
 import Navbar from "../components/navbar";
 
 export const claimsRoute = createRoute({
@@ -19,27 +19,21 @@ function Claims() {
   const { id } = claimsRoute.useParams();
   const [files, setFiles] = useState<File[]>([]);
 
-
-  const handleFileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFiles = Array.from(event.target.files || []);
-      setFiles((prev) => [...prev, ...selectedFiles]);
-    },
-    [],
-  );
-
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    setFiles((prev) => [...prev, ...selectedFiles]);
+  }, []);
 
   return (
-
     <div>
-      <Navbar/>
-      <div className="flex flex-col h-screen">
-      <div className="flex flex-col space-y-2 max-w-sm">
-        <input
-          type="file"
-          className="
+      <Navbar />
+      <div className='flex flex-col h-screen'>
+        <div className='flex flex-row justify-center bg-blue-100 space-y-2 my-8'>
+          <input
+            type='file'
+            className='
             text-sm
-          text-gray-500
+            text-gray-500
             file:mr-4
             file:py-2
             file:px-4
@@ -58,23 +52,20 @@ function Claims() {
             focus:ring-2
             focus:ring-blue-500
             focus:border-transparent
-          "
-          multiple
-          onChange={handleFileSelect}
-        />
-
-      </div>
-      <div className="flex flex-row flex-grow">
-        <div className="w-1/2 bg-white p-4">
-          <Upload files={files} setFiles={setFiles} id={id}/>
+            '
+            multiple
+            onChange={handleFileSelect}
+          />
         </div>
+        <div className='flex flex-row flex-grow'>
+          <div className='w-1/2 bg-white p-4'>
+            <Upload files={files} setFiles={setFiles} id={id} />
+          </div>
 
-
-        <div className="w-1/2 bg-green-100 p-4 overflow-auto">
-          <DataView />
+          <div className='w-1/2 p-4 overflow-auto'>
+            <DataView id={id} />
+          </div>
         </div>
-      </div>
-
       </div>
     </div>
   );

@@ -27,7 +27,7 @@ declare module "sst" {
       "type": "sst.aws.Function"
       "url": string
     }
-    "Queue": {
+    "Q": {
       "type": "sst.aws.Queue"
       "url": string
     }

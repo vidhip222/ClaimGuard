@@ -9,6 +9,7 @@ export default $config({
           version: "0.2.3",
           organization: "rgodha",
         },
+        cloudflare: "5.49.1",
       },
     };
   },
@@ -24,13 +25,10 @@ export default $config({
     const db = new turso.Database("db", {
       group: turso.getGroup({ id: "group" }).then((group) => group.id),
     });
-
     const anthropic = new sst.Secret("Anthropic");
-
     const bucket = new sst.aws.Bucket("Bucket", {
       access: "public",
     });
-
     const model = new sst.aws.Function("Model", {
       runtime: "rust" as any,
       handler: "model",
@@ -39,15 +37,18 @@ export default $config({
       url: true,
       architecture: "arm64",
     });
-
-    const queue = new sst.aws.Queue("Queue");
-    queue.subscribe({
-      name: "QueueSubscribeClaimGuard",
-      handler: "backend/src/queue.handler",
-      link: [db, bucket, model],
-      logging: false,
-    });
-
+    const queue = new sst.aws.Queue("Q");
+    queue.subscribe(
+      {
+        handler: "backend/src/queue.handler",
+        link: [db, bucket, model],
+        logging: false,
+        nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
+      },
+      {
+        batch: { size: 1 },
+      },
+    );
     bucket.notify({
       notifications: [
         {
@@ -61,11 +62,11 @@ export default $config({
         },
       ],
     });
-
     const backend = new sst.aws.Function("Backend", {
       handler: "backend/src/index.handler",
       url: true,
       link: [db, bucket],
+      nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
     });
 
     const frontend = new sst.aws.StaticSite("Frontend", {
@@ -77,10 +78,15 @@ export default $config({
       environment: {
         VITE_PUBLIC_API_URL: backend.url,
       },
+      domain: {
+        name: "claimguard.rohangodha.com",
+        dns: sst.cloudflare.dns(),
+      },
     });
 
     return {
       bucketname: bucket.name,
+      dbname: db.name,
     };
   },
 });

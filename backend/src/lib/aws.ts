@@ -54,7 +54,7 @@ export async function sendMessage(message: string) {
   console.log(message);
   await sqs.send(
     new SendMessageCommand({
-      QueueUrl: Resource.Queue.url,
+      QueueUrl: Resource.Q.url,
       MessageBody: message,
     }),
   );
