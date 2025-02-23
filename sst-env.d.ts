@@ -18,12 +18,12 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
-    "BucketUrl": {
-      "type": "sst.sst.Linkable"
-      "url": string
-    }
     "Frontend": {
       "type": "sst.aws.StaticSite"
+      "url": string
+    }
+    "Queue": {
+      "type": "sst.aws.Queue"
       "url": string
     }
     "db": {

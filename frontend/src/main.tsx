@@ -4,10 +4,10 @@ import "./globals.css";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { rootRoute } from "./routes/root";
 import { homeRoute } from "./routes/home";
-import { uploadRoute } from "./routes/upload";
+import { claimsRoute } from "./routes/claims";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const routeTree = rootRoute.addChildren([homeRoute, uploadRoute]);
+const routeTree = rootRoute.addChildren([homeRoute, claimsRoute]);
 const router = createRouter({ routeTree });
 const queryClient = new QueryClient();
 

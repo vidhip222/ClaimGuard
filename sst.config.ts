@@ -15,7 +15,6 @@ export default $config({
     };
   },
   async run() {
-    const anthropic = new sst.Secret("Anthropic");
     sst.Linkable.wrap(turso.Database, (db) => ({
       properties: {
         token: db.id.apply(
@@ -40,7 +39,7 @@ export default $config({
     const backend = new sst.aws.Function("Backend", {
       handler: "backend/src/index.handler",
       url: true,
-      link: [db, bucket, anthropic],
+      link: [db, bucket],
     });
 
     const frontend = new sst.aws.StaticSite("Frontend", {

@@ -12,9 +12,11 @@ export const images = s.sqliteTable("images", {
     .text("claim_id")
     .notNull()
     .references(() => claims.id),
+  type: s.text("type").notNull().$type<"image" | "video" | "audio" | "text">(),
 
-  s3key: s.text("s3key").notNull(),
-  fraudScore: s.real("fraud_score").notNull(),
+  fraudScore: s.real("fraud_score"),
+  count: s.integer("count").notNull().default(1),
+  processed: s.integer("processed").notNull().default(0),
 });
 
 export const claimsRelations = relations(claims, ({ many }) => ({
