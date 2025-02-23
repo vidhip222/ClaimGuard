@@ -9,6 +9,7 @@ import { logger } from "hono/logger";
 import { sValidator } from "@hono/standard-validator";
 import { z } from "zod";
 
+
 const app = new Hono()
   .use(logger())
   .get("/", (c) => c.text("Hello World"))

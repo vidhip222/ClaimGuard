@@ -5,6 +5,10 @@
 
 declare module "sst" {
   export interface Resource {
+    "Anthropic": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Backend": {
       "name": string
       "type": "sst.aws.Function"
