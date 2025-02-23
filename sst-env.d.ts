@@ -5,6 +5,10 @@
 
 declare module "sst" {
   export interface Resource {
+    "Anthropic": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Backend": {
       "name": string
       "type": "sst.aws.Function"
@@ -16,6 +20,15 @@ declare module "sst" {
     }
     "Frontend": {
       "type": "sst.aws.StaticSite"
+      "url": string
+    }
+    "Model": {
+      "name": string
+      "type": "sst.aws.Function"
+      "url": string
+    }
+    "Queue": {
+      "type": "sst.aws.Queue"
       "url": string
     }
     "db": {

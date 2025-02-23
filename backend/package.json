@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
     "@types/bun": "latest",
     "drizzle-kit": "^0.30.4",
     "sst": "^3.9.10"
@@ -17,11 +18,15 @@
     "migrate": "bun sst shell -- bun drizzle-kit migrate"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.36.3",
     "@aws-sdk/client-s3": "^3.750.0",
+    "@aws-sdk/client-sqs": "^3.750.0",
     "@aws-sdk/s3-request-presigner": "^3.750.0",
     "@hono/standard-validator": "^0.1.2",
     "@libsql/client": "^0.14.0",
     "drizzle-orm": "^0.39.3",
+    "ffmpeg-static": "^5.2.0",
+    "groq-sdk": "^0.15.0",
     "hono": "^4.7.2",
     "zod": "^3.24.2"
   }

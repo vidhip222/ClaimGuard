@@ -3,4 +3,6 @@ node_modules
 # sst
 .sst
 
+AI/emotion_detection_model_for_streamlit.h5
+
 .env

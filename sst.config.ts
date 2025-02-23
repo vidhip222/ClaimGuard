@@ -3,8 +3,6 @@ export default $config({
   app(input) {
     return {
       name: "claimguard",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "aws",
       providers: {
         turso: {
@@ -23,20 +21,51 @@ export default $config({
         url: $interpolate`libsql://${db.id}-rgodha.aws-us-east-1.turso.io`,
       },
     }));
-
     const db = new turso.Database("db", {
-      group: turso.getGroupOutput({ id: "group" }).id,
+      group: turso.getGroup({ id: "group" }).then((group) => group.id),
     });
+
+    const anthropic = new sst.Secret("Anthropic");
 
     const bucket = new sst.aws.Bucket("Bucket", {
       access: "public",
+    });
+
+    const model = new sst.aws.Function("Model", {
+      runtime: "rust" as any,
+      handler: "model",
+      link: [bucket],
+      layers: ["arn:aws:lambda:us-east-1:634758516618:layer:onnx2:1"],
+      url: true,
+      architecture: "arm64",
+    });
+
+    const queue = new sst.aws.Queue("Queue");
+    queue.subscribe({
+      name: "QueueSubscribeClaimGuard",
+      handler: "backend/src/queue.handler",
+      link: [db, bucket, model],
+      logging: false,
+    });
+
+    bucket.notify({
+      notifications: [
+        {
+          function: {
+            handler: "backend/src/subscriber.handler",
+            link: [bucket, db, queue, model, anthropic],
+            nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
+          },
+          name: "subscriber",
+          events: ["s3:ObjectCreated:*"],
+        },
+      ],
     });
 
     const backend = new sst.aws.Function("Backend", {
       handler: "backend/src/index.handler",
       url: true,
       link: [db, bucket],
-      nodejs: { install: ["@libsql/client"] },
     });
 
     const frontend = new sst.aws.StaticSite("Frontend", {
@@ -47,13 +76,11 @@ export default $config({
       },
       environment: {
         VITE_PUBLIC_API_URL: backend.url,
-        VITE_PUBLIC_BUCKET_URL: $interpolate`https://${bucket.name}.s3.amazonaws.com`,
       },
     });
 
     return {
       bucketname: bucket.name,
-      dbname: db.name,
     };
   },
 });
