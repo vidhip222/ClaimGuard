@@ -2,6 +2,11 @@ import Anthropic from '@anthropic-ai/sdk';
 import {Resource} from "sst";
 import * as fs from "node:fs";
 
+interface TextBlock {
+    type: 'text';
+    text: string;
+}
+
 async function analyzePDF(pdfPath: string): Promise<string> {
     try {
         // Validate PDF file exists
@@ -19,7 +24,7 @@ async function analyzePDF(pdfPath: string): Promise<string> {
         });
 
         // Make API request
-        const message = await anthropic.messages.create({
+        const response = await anthropic.messages.create({
             model: "claude-3-5-sonnet-20241022",
             max_tokens: 1024,
             messages: [
@@ -43,10 +48,13 @@ async function analyzePDF(pdfPath: string): Promise<string> {
             ]
         });
 
-        return message.content[0].text
+        return response.content
+            .filter(block => block.type === 'text')
+            .map(block => (block as TextBlock).text)
+            .join('\n');
 
     } catch (error) {
-        throw new Error(`Failed to analyze PDF: `, error);
+        throw new Error(`Failed to analyze PDF`);
     }
 }
 
@@ -71,7 +79,10 @@ async function analyzeText(inputText: string): Promise<string> {
             ]
         });
 
-        return response.content[0].text
+        return response.content
+            .filter(block => block.type === 'text')
+            .map(block => (block as TextBlock).text)
+            .join('\n');
 
     } catch (error) {
         console.error('Error analyzing text:', error);
