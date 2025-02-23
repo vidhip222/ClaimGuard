@@ -17,6 +17,7 @@ export const images = s.sqliteTable("images", {
   fraudScore: s.real("fraud_score").notNull().default(0),
   count: s.integer("count").notNull().default(1),
   processed: s.integer("processed").notNull().default(0),
+  cost: s.real("cost"),
 });
 
 export const claimsRelations = relations(claims, ({ many }) => ({

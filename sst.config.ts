@@ -25,6 +25,8 @@ export default $config({
       group: turso.getGroup({ id: "group" }).then((group) => group.id),
     });
 
+    const anthropic = new sst.Secret("Anthropic");
+
     const bucket = new sst.aws.Bucket("Bucket", {
       access: "public",
     });
@@ -51,7 +53,7 @@ export default $config({
         {
           function: {
             handler: "backend/src/subscriber.handler",
-            link: [bucket, db, queue, model],
+            link: [bucket, db, queue, model, anthropic],
             nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
           },
           name: "subscriber",

@@ -24,16 +24,12 @@ function Claims() {
       const data = await res.json();
       return data;
     },
-    refetchInterval: 1000,
   });
 
-  const handleFileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFiles = Array.from(event.target.files || []);
-      setFiles((prev) => [...prev, ...selectedFiles]);
-    },
-    [],
-  );
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    setFiles((prev) => [...prev, ...selectedFiles]);
+  }, []);
 
   const handleUploadComplete = useCallback((file: File) => {
     setFiles((prev) => prev.filter((f) => f !== file));
@@ -41,18 +37,12 @@ function Claims() {
   }, []);
 
   return (
-    <div className="p-4">
-      <div className="mb-4">
-        <input
-          type="file"
-          multiple
-          onChange={handleFileSelect}
-          className="mb-2"
-          accept="*"
-        />
+    <div className='p-4'>
+      <div className='mb-4'>
+        <input type='file' multiple onChange={handleFileSelect} className='mb-2' accept='*' />
       </div>
 
-      <div className="space-y-2">
+      <div className='space-y-2'>
         {/* Pending Uploads */}
         {files.map((file, index) => (
           <FileItem
@@ -65,12 +55,7 @@ function Claims() {
 
         {/* Completed Uploads */}
         {claim.data?.images.map((image) => (
-          <FileItem
-            key={image.id}
-            claimId={id}
-            claimImage={image}
-            onUploadComplete={() => {}}
-          />
+          <FileItem key={image.id} claimId={id} claimImage={image} onUploadComplete={() => {}} />
         ))}
 
         {JSON.stringify(claim.data)}
