@@ -14,7 +14,7 @@ export const images = s.sqliteTable("images", {
     .references(() => claims.id),
   type: s.text("type").notNull().$type<"image" | "video" | "audio" | "text">(),
 
-  fraudScore: s.real("fraud_score"),
+  fraudScore: s.real("fraud_score").notNull().default(0),
   count: s.integer("count").notNull().default(1),
   processed: s.integer("processed").notNull().default(0),
 });

@@ -3,8 +3,6 @@ export default $config({
   app(input) {
     return {
       name: "claimguard",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "aws",
       providers: {
         turso: {
@@ -32,10 +30,21 @@ export default $config({
       access: "public",
     });
 
+    const model = new sst.aws.Function("Model", {
+      runtime: "rust" as any,
+      handler: "model",
+      link: [bucket],
+      layers: ["arn:aws:lambda:us-east-1:634758516618:layer:onnx2:1"],
+      url: true,
+      architecture: "arm64",
+    });
+
     const queue = new sst.aws.Queue("Queue");
     queue.subscribe({
+      name: "QueueSubscribeClaimGuard",
       handler: "backend/src/queue.handler",
-      link: [db, bucket],
+      link: [db, bucket, model],
+      logging: false,
     });
 
     bucket.notify({
@@ -43,7 +52,7 @@ export default $config({
         {
           function: {
             handler: "backend/src/subscriber.handler",
-            link: [bucket, db, queue],
+            link: [bucket, db, queue, model],
             nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
           },
           name: "subscriber",
