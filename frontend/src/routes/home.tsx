@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../api";
+import Navbar from "../components/navbar";
 
 export const homeRoute = createRoute({
   path: "/",
@@ -32,15 +33,7 @@ export default function LandingPage() {
   });
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-800">
-      <header className="bg-blue-600 text-white py-4">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-2">
-            <Shield className="h-8 w-8" />
-            <span className="text-2xl font-bold">ClaimGuard</span>
-          </div>
-        </div>
-      </header>
-
+      <Navbar/>
       <main className="flex-grow">
         <section className="bg-blue-600 text-white py-20">
           <div className="container mx-auto px-4 text-center">
