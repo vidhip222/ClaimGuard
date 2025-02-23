@@ -1,6 +1,7 @@
 // FileItem.tsx
 import { useMutation } from "@tanstack/react-query";
 import { api } from "../api";
+import { useEffect } from "react";
 
 interface FileItemProps {
   file?: File;
@@ -11,6 +12,7 @@ interface FileItemProps {
     fraudScore: number | null;
   };
   onUploadComplete: () => void;
+  startUpload: boolean;
 }
 
 const mimeTypeCategories = {
@@ -47,6 +49,7 @@ export function FileItem({
   claimId,
   claimImage,
   onUploadComplete,
+  startUpload
 }: FileItemProps) {
   const uploadMutation = useMutation({
     mutationFn: async (fileToUpload: File) => {
@@ -82,6 +85,12 @@ export function FileItem({
       onUploadComplete();
     },
   });
+
+  useEffect(() => {
+    if(startUpload){
+      uploadMutation.mutate(file!);
+    }
+  }, [startUpload])
 
   // If we have a claimImage, render the completed upload view
   if (claimImage) {

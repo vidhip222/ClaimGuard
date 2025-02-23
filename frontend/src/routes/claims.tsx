@@ -5,6 +5,9 @@ import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root";
 import { api } from "../api";
 import { FileItem } from "../lib/file-item";
+import DataView from '../components/dataView';
+import Upload from '../components/upload';
+import Navbar from "../components/navbar";
 
 export const claimsRoute = createRoute({
   path: "/claim/$id",
@@ -16,16 +19,6 @@ function Claims() {
   const { id } = claimsRoute.useParams();
   const [files, setFiles] = useState<File[]>([]);
 
-  const claim = useQuery({
-    queryKey: ["claim", id],
-    queryFn: async () => {
-      const res = await api.claim[":id"].$get({ param: { id } });
-      if (!res.ok) throw new Error("Failed to fetch claim");
-      const data = await res.json();
-      return data;
-    },
-  });
-
   const handleFileSelect = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFiles = Array.from(event.target.files || []);
@@ -34,43 +27,48 @@ function Claims() {
     [],
   );
 
-  const handleUploadComplete = useCallback((file: File) => {
-    setFiles((prev) => prev.filter((f) => f !== file));
-    claim.refetch(); // Refresh the claim data to show the new upload
-  }, []);
-
   return (
-    <div className="p-4">
-      <div className="mb-4">
+    <div>
+      <Navbar/>
+      <div className="flex flex-col h-screen">
+      <div className="flex flex-col space-y-2 max-w-sm">
         <input
           type="file"
+          className="
+            text-sm
+          text-gray-500
+            file:mr-4
+            file:py-2
+            file:px-4
+            file:rounded
+            file:border-0
+            file:text-sm
+            file:font-semibold
+            file:bg-gray-200
+            file:text-gray-600
+            hover:file:bg-gray-300
+            bg-white
+            border
+            border-gray-300
+            rounded
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-500
+            focus:border-transparent
+          "
           multiple
           onChange={handleFileSelect}
-          className="mb-2"
-          accept="*"
         />
       </div>
+      <div className="flex flex-row flex-grow">
+        <div className="w-1/2 bg-white p-4">
+          <Upload files={files} setFiles={setFiles} id={id}/>
+        </div>
 
-      <div className="space-y-2">
-        {/* Pending Uploads */}
-        {files.map((file, index) => (
-          <FileItem
-            key={`pending-${index}`}
-            file={file}
-            claimId={id}
-            onUploadComplete={() => handleUploadComplete(file)}
-          />
-        ))}
-
-        {/* Completed Uploads */}
-        {claim.data?.images.map((image) => (
-          <FileItem
-            key={image.id}
-            claimId={id}
-            claimImage={image}
-            onUploadComplete={() => {}}
-          />
-        ))}
+        <div className="w-1/2 bg-green-100 p-4 overflow-auto">
+          <DataView />
+        </div>
+      </div>
       </div>
     </div>
   );
