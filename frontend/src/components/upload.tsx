@@ -47,12 +47,12 @@ export default function Upload(props: {files: File[], setFiles: any, id: String}
                     claimId={props.id.toString()}
                     claimImage={image}
                     onUploadComplete={() => {}}
-                    startUpload={startUpload}
+                    startUpload={false}
                 />
             ))}
             <button
                 onClick={() => setStartUpload(true)}
-                disabled={startUpload}
+                disabled={startUpload || props.files.length == 0}
                 className="px-3 py-1 bg-blue-500 text-white rounded disabled:bg-gray-300"
             >
                 Submit Documents
