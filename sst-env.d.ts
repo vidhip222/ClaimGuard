@@ -18,6 +18,10 @@ declare module "sst" {
       "type": "sst.aws.StaticSite"
       "url": string
     }
+    "Queue": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
     "db": {
       "token": string
       "type": "turso.index/database.Database"

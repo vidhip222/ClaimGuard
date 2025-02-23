@@ -32,6 +32,26 @@ export default $config({
       access: "public",
     });
 
+    const queue = new sst.aws.Queue("Queue");
+    queue.subscribe({
+      handler: "backend/src/queue.handler",
+      link: [db, bucket],
+    });
+
+    bucket.notify({
+      notifications: [
+        {
+          function: {
+            handler: "backend/src/subscriber.handler",
+            link: [bucket, db, queue],
+            nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
+          },
+          name: "subscriber",
+          events: ["s3:ObjectCreated:*"],
+        },
+      ],
+    });
+
     const backend = new sst.aws.Function("Backend", {
       handler: "backend/src/index.handler",
       url: true,
