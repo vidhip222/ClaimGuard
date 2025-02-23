@@ -3,8 +3,6 @@ export default $config({
   app(input) {
     return {
       name: "claimguard",
-      removal: input?.stage === "production" ? "retain" : "remove",
-      protect: ["production"].includes(input?.stage),
       home: "aws",
       providers: {
         turso: {
@@ -30,10 +28,36 @@ export default $config({
     const bucket = new sst.aws.Bucket("Bucket", {
       access: "public",
     });
-    new sst.Linkable("BucketUrl", {
-      properties: {
-        url: $interpolate`https://${bucket.name}.s3.amazonaws.com`,
-      },
+
+    const model = new sst.aws.Function("Model", {
+      runtime: "rust" as any,
+      handler: "model",
+      link: [bucket],
+      layers: ["arn:aws:lambda:us-east-1:634758516618:layer:onnx2:1"],
+      url: true,
+      architecture: "arm64",
+    });
+
+    const queue = new sst.aws.Queue("Queue");
+    queue.subscribe({
+      name: "QueueSubscribeClaimGuard",
+      handler: "backend/src/queue.handler",
+      link: [db, bucket, model],
+      logging: false,
+    });
+
+    bucket.notify({
+      notifications: [
+        {
+          function: {
+            handler: "backend/src/subscriber.handler",
+            link: [bucket, db, queue, model],
+            nodejs: { install: ["@libsql/client", "ffmpeg-static"] },
+          },
+          name: "subscriber",
+          events: ["s3:ObjectCreated:*"],
+        },
+      ],
     });
 
     const backend = new sst.aws.Function("Backend", {

@@ -24,6 +24,7 @@ function Claims() {
       const data = await res.json();
       return data;
     },
+    refetchInterval: 1000,
   });
 
   const handleFileSelect = useCallback(
@@ -71,6 +72,8 @@ function Claims() {
             onUploadComplete={() => {}}
           />
         ))}
+
+        {JSON.stringify(claim.data)}
       </div>
     </div>
   );

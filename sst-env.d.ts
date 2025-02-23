@@ -22,6 +22,11 @@ declare module "sst" {
       "type": "sst.aws.StaticSite"
       "url": string
     }
+    "Model": {
+      "name": string
+      "type": "sst.aws.Function"
+      "url": string
+    }
     "Queue": {
       "type": "sst.aws.Queue"
       "url": string
